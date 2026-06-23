@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /home/almukhadram/.claude/projects/-home-almukhadram-Desktop-AO/memory/)",
+      "WebSearch",
+      "Bash(python3 generate_note_methodologique.py)",
+      "Bash(pip install *)",
+      "Bash(java -version)",
+      "Read(//usr/**)",
+      "Bash(apt-cache show *)",
+      "Bash(python generate_note_methodologique.py)",
+      "Bash(python3 -)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 generate_note_methodologique_defr.py)"
+    ],
+    "additionalDirectories": [
+      "/home/almukhadram/.claude/projects/-home-almukhadram-Desktop-AO",
+      "/home/almukhadram/.claude/commands"
+    ]
+  }
+}
