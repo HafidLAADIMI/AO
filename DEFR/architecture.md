@@ -98,6 +98,7 @@ correspondance 1:1 avec les 11 blocs fonctionnels du CPS (Art.19.5). Avec une é
 une qualité d'architecture.
 
 ### 2.1 API Gateway
+
 Point d'entrée unique. Validation des tokens Entra ID, résolution du contexte tenant/rôle
 (`efpa_id`, rôle DEFR/EFPA/enseignant/stagiaire), routage, rate limiting, intercepteur d'audit
 centralisé. Ne contient aucune logique métier.
@@ -107,11 +108,13 @@ des vues SPA qui consomment les autres services via ce Gateway, pas des services
 ils ne possèdent aucune donnée propre.
 
 ### 2.2 Référentiel Service
+
 Données maîtres : EFPA (infrastructures, capacités), filières, modules, volumes horaires,
 ressources pédagogiques, enseignants, groupes de stagiaires. Référencé par tous les autres
 services (`efpa_id`, `filiere_id`, `module_id` comme clés étrangères).
 
 ### 2.3 Parcours Apprenant Service
+
 Regroupe volontairement : admissions et concours, scolarité (inscriptions, assiduité, discipline,
 abandons, changements de filière), évaluation et diplomation. Justification du regroupement : ces
 trois blocs du CPS opèrent sur la même entité pivot, le dossier de l'apprenant, du dépôt de
@@ -119,37 +122,45 @@ candidature à la diplomation. Les séparer créerait des transactions distribu�
 même donnée. Candidat naturel à scinder plus tard si l'équipe grandit, pas à la livraison.
 
 ### 2.4 Planning & Ressources Service
+
 Emplois du temps annuels, occupation salles/enseignants, feuilles de service, heures de vacation.
 Séparé du précédent car il porte une logique de résolution de contraintes (conflits
 salle/enseignant/créneau), différente d'un CRUD de dossier.
 
 ### 2.5 Stages & Insertion Service
+
 Banque d'entreprises, affectation des stagiaires, suivi de l'insertion professionnelle.
 
 ### 2.6 Certification Service
+
 Édition des documents officiels, certification numérique (Barid eSign), génération QR code,
 archivage sécurisé. Isolé car seul service appelant une PKI externe et nécessitant le pattern
 file d'attente (BullMQ) pour ne pas bloquer l'event loop.
 
 ### 2.7 BI & Reporting Service
+
 Couche sémantique Headless BI (Cube.dev), alimentée par CDC depuis les bases OLTP. Jamais de
 requête directe sur les bases transactionnelles.
 
 ### 2.8 Bot APC / IA Service
+
 Orchestration LangChain.js, retrieval pgvector, appel au moteur d'inférence GPU externe
 (vLLM/TGI). Indexe les référentiels APC, GOPM, plans de modules.
 
 ### 2.9 Interopérabilité & Migration Service
+
 Synchronisation Moodle (groupes, notes), pont M365/Graph au-delà de l'authentification, outillage
 de migration HELISA (job batch, Phase I/III, intensité dégressive après mise en service).
 
 ### 2.10 Composants d'infrastructure transverses (pas des services métier)
+
 - Redis : files BullMQ, cache de session
 - Audit Trail Store : table append-only séparée des bases transactionnelles, partitionnée
   mensuellement, conservation 12 mois glissants (Art.19.3.5 / 19.4.4 CPS)
 - PostgreSQL + RLS + pgvector (voir 1.4, 1.5)
 
 ### 2.11 Communication inter-services
+
 - Synchrone REST/JSON pour les lectures de référentiel
 - Asynchrone par événements (BullMQ) pour tout ce qui ne doit pas bloquer une réponse
   utilisateur : certification, notifications, ré-indexation du Bot APC après mise à jour d'un
